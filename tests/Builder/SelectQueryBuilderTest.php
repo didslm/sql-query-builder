@@ -61,4 +61,15 @@ class SelectQueryBuilderTest extends TestCase
         $this->assertEquals("SELECT * FROM users WHERE name REGEXP 'a|z'", $query);
     }
 
+    public function testSelectWithMultipleRegexFields()
+    {
+        $sql = SelectQueryBuilder::from('candidates')
+            ->select(Select::ALL)
+            ->where('title', 'REGEXP', ':title')
+            ->where('level', 'REGEXP', ':level')
+            ->toSql();
+
+        $this->assertEquals("SELECT * FROM candidates WHERE title REGEXP ':title' AND level REGEXP ':level'", $sql);
+    }
+
 }
