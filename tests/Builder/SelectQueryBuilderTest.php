@@ -3,7 +3,7 @@
 namespace Didslm\QueryBuilder\Tests\Builder;
 
 
-use Didslm\QueryBuilder\Builder\SelectQueryBuilder;
+use Didslm\QueryBuilder\Builder\SelectBuilder;
 use Didslm\QueryBuilder\Components\Select;
 use PHPUnit\Framework\TestCase;
 
@@ -12,64 +12,102 @@ class SelectQueryBuilderTest extends TestCase
 {
     public function testBasicSelect()
     {
-        $query = SelectQueryBuilder::from('users')
+        $query = SelectBuilder::from('users')
             ->select(Select::ALL)->toSql();
 
-        $this->assertEquals('SELECT * FROM users', $query);
+        $this->assertEquals('SELECT users.* FROM users', $query);
     }
 
     public function testSelectWithWhere()
     {
-        $query = SelectQueryBuilder::from('users')
+        $query = SelectBuilder::from('users')
             ->select(Select::ALL)
-            ->where('age', '>', 18)->toSql();
+            ->where('age', 18, '>')->toSql();
 
-        $this->assertEquals("SELECT * FROM users WHERE age > '18'", $query);
+        $this->assertEquals("SELECT users.* FROM users WHERE age > '18'", $query);
     }
 
     public function testSelectWithMultipleWhere()
     {
-        $queryBuilder = new SelectQueryBuilder();
+        $queryBuilder = new SelectBuilder();
 
-        $query = SelectQueryBuilder::from('users')
+        $query = SelectBuilder::from('users')
             ->select(Select::ALL)
-            ->where('age', '>', 18)
-            ->where('status', '=', 'active')
+            ->where('age', 18, '>')
+            ->where('status', 'active', '=')
             ->toSql();
 
-        $this->assertEquals("SELECT * FROM users WHERE age > '18' AND status = 'active'", $query);
+        $this->assertEquals("SELECT users.* FROM users WHERE age > '18' AND status = 'active'", $query);
     }
 
     public function testSelectWithOrder()
     {
 
-        $query = SelectQueryBuilder::from('users')
+        $query = SelectBuilder::from('users')
             ->select(Select::ALL)
             ->orderBy('name')
             ->toSql();
 
-        $this->assertEquals("SELECT * FROM users ORDER BY name ASC", $query);
+        $this->assertEquals("SELECT users.* FROM users ORDER BY name ASC", $query);
     }
 
     public function testSelectWithRegex()
     {
-        $query = SelectQueryBuilder::from('users')
+        $query = SelectBuilder::from('users')
             ->select(Select::ALL)
             ->whereRegex('name', implode('|', ['a', 'z']))
             ->toSql();
 
-        $this->assertEquals("SELECT * FROM users WHERE name REGEXP 'a|z'", $query);
+        $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP 'a|z'", $query);
     }
 
     public function testSelectWithMultipleRegexFields()
     {
-        $sql = SelectQueryBuilder::from('candidates')
+        $sql = SelectBuilder::from('candidates')
             ->select(Select::ALL)
-            ->where('title', 'REGEXP', ':title')
-            ->where('level', 'REGEXP', ':level')
+            ->where('title', ':title', 'REGEXP')
+            ->where('level', ':level', 'REGEXP')
             ->toSql();
 
-        $this->assertEquals("SELECT * FROM candidates WHERE title REGEXP ':title' AND level REGEXP ':level'", $sql);
+        $this->assertEquals("SELECT candidates.* FROM candidates WHERE title REGEXP ':title' AND level REGEXP ':level'", $sql);
+    }
+
+    public function testLeftJoinQuery()
+    {
+        $sql = SelectBuilder::from('users')
+            ->leftJoin('posts', 'users.id', 'posts.user_id');
+
+        $this->assertEquals("SELECT users.* FROM users LEFT JOIN posts ON users.id = posts.user_id", $sql);
+    }
+
+    public function testMultipleLeftJoins()
+    {
+        $sql = SelectBuilder::from('users')
+            ->leftJoin('posts', 'users.id', 'posts.user_id')
+            ->leftJoin('comments', 'users.id', 'comments.user_id');
+
+        $this->assertEquals("SELECT users.* FROM users LEFT JOIN posts ON users.id = posts.user_id LEFT JOIN comments ON users.id = comments.user_id", $sql);
+    }
+
+    public function testMultipleLeftJoinsWithMultipleTableSelects()
+    {
+        $sql = SelectBuilder::from('users')
+            ->leftJoin('posts', 'users.id', 'posts.user_id')
+            ->leftJoin('comments', 'users.id', 'comments.user_id')
+            ->select('users.id', 'posts.title', 'comments.body');
+
+        $this->assertEquals("SELECT users.id, posts.title, comments.body FROM users LEFT JOIN posts ON users.id = posts.user_id LEFT JOIN comments ON users.id = comments.user_id", $sql);
+    }
+
+    public function testInnerJoinQuery()
+    {
+        $sql = SelectBuilder::from('users')
+            ->innerJoin('posts', 'users.id', 'posts.user_id')
+            ->where('posts.status', 'published', '=')
+            ->where('posts.published_at', '2020-01-01', '>')
+            ->toSql();
+
+        $this->assertEquals("SELECT users.* FROM users INNER JOIN posts ON users.id = posts.user_id WHERE posts.status = 'published' AND posts.published_at > '2020-01-01'", $sql);
     }
 
 }

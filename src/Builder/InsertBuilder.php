@@ -2,7 +2,7 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-class InsertQuery
+class InsertBuilder
 {
     private string $table;
     private array $columns;
@@ -13,13 +13,13 @@ class InsertQuery
         $this->table = $table;
     }
 
-    public function addColumns(array $columns): InsertQuery
+    public function addColumns(array $columns): InsertBuilder
     {
         $this->columns = $columns;
         return $this;
     }
 
-    public function addValues(array $values): InsertQuery
+    public function addValues(array $values): InsertBuilder
     {
         if (count($this->columns) !== count($values)) {
             throw new \Exception('Number of columns and values do not match');
@@ -42,7 +42,12 @@ class InsertQuery
         );
     }
 
-    public static function into(string $table): InsertQuery
+    public function __toString(): string
+    {
+        return $this->toSql();
+    }
+
+    public static function into(string $table): InsertBuilder
     {
         return new static($table);
     }
