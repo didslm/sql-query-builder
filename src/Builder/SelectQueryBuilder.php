@@ -5,6 +5,7 @@ namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\OrderBy;
 use Didslm\QueryBuilder\Components\Regex;
+use Didslm\QueryBuilder\Components\Select;
 use Didslm\QueryBuilder\Components\Where;
 use Didslm\QueryBuilder\QueryBuilderInterface;
 
@@ -21,6 +22,7 @@ class SelectQueryBuilder implements QueryBuilder, QueryBuilderInterface
     {
         $queryBuilder = new self();
         $queryBuilder->fromTable = $table;
+        $queryBuilder->select(Select::ALL);
         return $queryBuilder;
     }
 
