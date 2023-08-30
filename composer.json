@@ -21,7 +21,7 @@
     }
   },
   "scripts": {
-    "test": "phpunit --colors=always",
+    "test": "phpunit --colors=always tests/",
     "static-analysis": "phpstan analyse src",
     "fix": "php-cs-fixer fix"
   },
