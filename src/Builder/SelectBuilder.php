@@ -10,7 +10,7 @@ use Didslm\QueryBuilder\Components\Select;
 use Didslm\QueryBuilder\Components\Where;
 use Didslm\QueryBuilder\QueryBuilderInterface;
 
-class SelectBuilder implements QueryBuilder, QueryBuilderInterface
+class SelectBuilder implements SelectQueryBuilderInterface
 {
     protected array $columns = [];
     protected string $fromTable;
