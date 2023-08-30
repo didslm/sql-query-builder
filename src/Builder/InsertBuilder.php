@@ -32,15 +32,18 @@ class InsertBuilder
     public function toSql(): string
     {
         $columns = implode(', ', $this->columns);
-        $values = implode("', '", $this->values);
+        $values = implode(', ', array_map(function($value) {
+            return (strpos($value, ':') === 0) ? $value : sprintf("'%s'", $value);
+        }, $this->values));
 
         return sprintf(
-            "INSERT INTO %s (%s) VALUES ('%s')",
+            "INSERT INTO %s (%s) VALUES (%s)",
             $this->table,
             $columns,
             $values
         );
     }
+
 
     public function __toString(): string
     {

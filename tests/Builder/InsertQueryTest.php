@@ -45,4 +45,14 @@ class InsertQueryTest extends TestCase
         $expectedSql = "INSERT INTO users (name, email) VALUES ('John Doe', 'john@example.com')";
         $this->assertEquals($expectedSql, $query->toSql());
     }
+
+    public function testInsertWithPlaceholder(): void
+    {
+        $query = InsertBuilder::into('users')
+            ->addColumns(['name', 'email'])
+            ->addValues([':name', ':email']);
+
+        $expectedSql = "INSERT INTO users (name, email) VALUES (:name, :email)";
+        $this->assertEquals($expectedSql, $query->toSql());
+    }
 }
