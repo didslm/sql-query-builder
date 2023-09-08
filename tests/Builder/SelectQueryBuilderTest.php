@@ -69,7 +69,7 @@ class SelectQueryBuilderTest extends TestCase
             ->where('level', ':level', 'REGEXP')
             ->toSql();
 
-        $this->assertEquals("SELECT candidates.* FROM candidates WHERE title REGEXP ':title' AND level REGEXP ':level'", $sql);
+        $this->assertEquals("SELECT candidates.* FROM candidates WHERE title REGEXP :title AND level REGEXP :level", $sql);
     }
 
     public function testLeftJoinQuery()
@@ -108,6 +108,26 @@ class SelectQueryBuilderTest extends TestCase
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users INNER JOIN posts ON users.id = posts.user_id WHERE posts.status = 'published' AND posts.published_at > '2020-01-01'", $sql);
+    }
+
+    public function testSelectWithRegexConditionUsingPlaceholders()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where('name', ':regex', 'REGEXP')
+            ->toSql();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP :regex", $sql);
+    }
+
+    public function testSelectWithRegexMultipleConditionsWithPlaceholders()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where('name', ':regex', 'REGEXP')
+            ->where('email', ':regex', 'REGEXP')
+            ->toSql();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP :regex AND email REGEXP :regex", $sql);
+
     }
 
 }
