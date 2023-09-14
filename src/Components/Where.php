@@ -11,11 +11,12 @@ class Where implements Condition
     private string|float|int|null $value;
     private string $operator;
 
-    public function __construct(string $field, string|float|int|null $value, string $operator = self::DEFAULT_OPERATOR)
+    public function __construct(string $field, string|float|int|null $value, ?string $operator = null)
     {
+
         $this->field = $field;
         $this->value = $value;
-        $this->operator = $operator;
+        $this->operator = $operator ?? self::DEFAULT_OPERATOR;
 
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));

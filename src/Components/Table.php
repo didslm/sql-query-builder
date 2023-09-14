@@ -4,7 +4,7 @@ namespace Didslm\QueryBuilder\Components;
 
 class Table {
 
-    public function __construct(private string $table, private ?string $alias){}
+    public function __construct(private string $table, private ?string $alias = null){}
 
     public function getTable(): string
     {

@@ -2,20 +2,44 @@
 
 namespace Didslm\QueryBuilder\Components\Joins;
 
-class InnerJoin
+use Didslm\QueryBuilder\Components\Table;
+use Didslm\QueryBuilder\Utilities\AliasResolver;
+
+class InnerJoin implements Join
 {
-    private string $table;
-    private string $column;
-    private string $foreignColumn;
-    public function __construct(string $table, string $column, string $foreignColumn)
+    private ?Table $parentTable = null;
+    public function __construct(private string|Table $table, private string $column, private string $foreignColumn){
+        if (is_string($table)) {
+            $this->table = new Table($table);
+        }
+    }
+
+    public function getColumn(): string
     {
-        $this->table = $table;
-        $this->column = $column;
-        $this->foreignColumn = $foreignColumn;
+        return $this->column;
+    }
+
+    public function getReference(): string
+    {
+        return $this->foreignColumn;
+    }
+
+    public function getTable(): string
+    {
+        return $this->table->getTable();
+    }
+
+
+
+    public function setParentTable(Table $table): void
+    {
+        $this->parentTable = $table;
     }
 
     public function toSql(): string
     {
-        return sprintf('INNER JOIN %s ON %s = %s', $this->table, $this->column, $this->foreignColumn);
+        $column = AliasResolver::resolve($this->table, $this->column);
+        $refrence = AliasResolver::resolve($this->parentTable, $this->foreignColumn);
+        return sprintf('INNER JOIN %s ON %s = %s', $this->table->getTable(), $column, $refrence);
     }
 }

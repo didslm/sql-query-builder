@@ -3,15 +3,26 @@
 namespace Didslm\QueryBuilder\Components\Joins;
 
 use Didslm\QueryBuilder\Components\Table;
+use Didslm\QueryBuilder\Utilities\AliasResolver;
 
 class LeftJoin implements Join
 {
+    private ?Table $parentTable = null;
     
     public function __construct(
         private string|Table $table, 
         private string $column, 
         private string $reference
-    ){}
+    ){
+        if (is_string($table)) {
+            $this->table = new Table($table);
+        }
+    }
+
+    public function setParentTable(Table $table): void
+    {
+        $this->parentTable = $table;
+    }
 
     public function getColumn(): string
     {
@@ -31,13 +42,9 @@ class LeftJoin implements Join
 
     public function toSql(): string
     {
-        if ($this->table instanceof Table) {
-            $column = $this->column;
-            if ($this->table->hasAlias() && !str_contains($this->column, '.')) {
-                $column = "{$this->table->getAlias()}.{$this->column}";
-            }
-            return "LEFT JOIN {$this->table->toSql()} ON {$column} = {$this->reference}";
-        }
-        return "LEFT JOIN {$this->table} ON {$this->column} = {$this->reference}";
+        $column = AliasResolver::resolve($this->table, $this->column);
+        $refrence = AliasResolver::resolve($this->parentTable, $this->reference);
+        
+        return "LEFT JOIN {$this->table->toSql()} ON {$column} = {$refrence}";
     }
 }

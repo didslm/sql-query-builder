@@ -47,8 +47,8 @@ class UpdateQueryTest extends TestCase
         $builder = new UpdateBuilder('test_table');
         $sql = $builder->addColumns(['column1'])
             ->addValues(['value1'])
-            ->where(Where::create('column2', 'value2'))
-            ->where(Where::create('column3', 'value3'))
+            ->where('column2', 'value2')
+            ->where('column3', 'value3')
             ->toSql();
 
         $this->assertEquals("UPDATE test_table  SET column1 = 'value1' WHERE column2 = 'value2' AND column3 = 'value3'", $sql);
@@ -70,8 +70,8 @@ WHERE t1.a = 'blah';
             ->addValues(['value1'])
             ->innerJoin('table2', 'table2.user_id', 't1.id')
             ->innerJoin('table3', 'table3.order_id', 'table2.id')
-            ->where(Where::create('t1.id', '1'))
-            ->where(Where::create('table3.name', 'diar'))
+            ->where('t1.id', 1)
+            ->where('table3.name', 'diar')
             ->toSql();
 
 
