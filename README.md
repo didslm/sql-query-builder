@@ -30,8 +30,8 @@ use Didslm\QueryBuilder\SelectQueryBuilder;
 
 $query = SelectQueryBuilder::from('users')
     ->select('*')
-    ->where(new Where('age', 18))
-    ->toSql();
+    ->where('age', 18)
+    ->build();
 
 echo $query;  // Outputs: SELECT * FROM users WHERE age = 18
 ```
@@ -41,10 +41,10 @@ echo $query;  // Outputs: SELECT * FROM users WHERE age = 18
 ```php
 $query = SelectQueryBuilder::from('users')
     ->select('*')
-    ->join(new LeftJoin('posts', 'users.id', 'posts.user_id'))
-    ->where(new Where('users.age', '>', 18))
-    ->where(new Where('posts.published', true))
-    ->toSql();
+    ->join('posts', 'users.id', 'posts.user_id')
+    ->where('users.age', 18, '>')
+    ->where('posts.published', true)
+    ->build();
 
 echo $query;  // Outputs: SELECT * FROM users JOIN posts ON users.id = posts.user_id WHERE users.age > 18 AND posts.published = true
 ```

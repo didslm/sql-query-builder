@@ -106,7 +106,7 @@ class SelectQueryBuilderTest extends TestCase
             ->leftJoin('comments', 'users.id', 'comments.user_id')
             ->select('users.id', 'posts.title', 'comments.body')->build();
 
-        $this->assertEquals("SELECT users.id, posts.title, comments.body FROM users LEFT JOIN posts ON users.id = posts.user_id LEFT JOIN comments ON users.id = comments.user_id", $sql->toSql());
+        $this->assertEquals("SELECT users.id, posts.title, comments.body FROM users LEFT JOIN posts ON users.id = posts.user_id LEFT JOIN comments ON users.id = comments.user_id", $sql);
     }
 
     public function testInnerJoinQuery()

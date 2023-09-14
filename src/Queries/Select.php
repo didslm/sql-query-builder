@@ -41,6 +41,10 @@ class Select implements QueryType
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return $this->toSql();
+    }
 
     public function toSql(): string
     {

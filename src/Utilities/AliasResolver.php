@@ -6,9 +6,13 @@ use Didslm\QueryBuilder\Components\Table;
 
 class AliasResolver
 {
-    public static function resolve(?Table $table, string $column): string
+    public static function resolve(?Table $table, string $column, ?bool $hasJoins = false): string
     {
         if (str_contains($column, '.') || $table === null) {
+            return $column;
+        }
+
+        if (!$hasJoins) {
             return $column;
         }
 

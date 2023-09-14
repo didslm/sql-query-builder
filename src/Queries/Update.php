@@ -3,45 +3,66 @@
 namespace Didslm\QueryBuilder\Queries;
 
 use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\Table;
+use Didslm\QueryBuilder\Utilities\AliasResolver;
 use Didslm\QueryBuilder\Utilities\Cleaner;
+use Didslm\QueryBuilder\Utilities\ValueResolver;
 
-class Update 
+class Update implements QueryType
 {
     private array $conditions = [];
     private array $columns = [];
     private array $values = [];
+    private array $joins = [];
 
     public function __construct(private Table $table){}
 
-    public function setColumns(array $values): Update
+    public function addValue(string|int|float $value): Update
     {
-        $this->values = $values;
+        $this->values[] = Cleaner::clean($value);
         return $this;
     }
 
-    public function setValues(array $values): Update
+    public function addColumn(string $column): Update
     {
-        $this->values = $values;
+        $this->columns[] = $column;
         return $this;
     }
 
-    public function where(Condition $condition): Update
+    public function addWhere(Condition $condition): Update
     {
         $this->conditions[] = $condition;
         return $this;
     }
 
+    public function addJoin(Join $join): Update
+    {
+        $this->joins[] = $join;
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->toSql();
+    }
+
     public function toSql(): string
     {
-        $this->values = array_map(fn($value) => Cleaner::clean($value), $this->values);
-        
-        $sql = "UPDATE {$this->table->toSql()} SET ";
-        $sql .= implode(', ', array_map(fn($column, $value) => "{$column} = {$value}", $this->columns, $this->values));
+        $sql = sprintf('UPDATE %s', $this->table->getTable());
+
+        if (count($this->joins) > 0) {
+            $sql .= ' ';
+            $sql .= implode(' ', array_map(fn($join) => $join->toSql(), $this->joins));
+        }
+
+        $sql .= ' SET '.implode(', ', array_map(fn($column, $value) => sprintf('%s = %s', AliasResolver::resolve($this->table, $column, count($this->joins) > 0), ValueResolver::resolve($value)), $this->columns, $this->values));
+
         if (count($this->conditions) > 0) {
             $sql .= ' WHERE ';
             $sql .= implode(' AND ', array_map(fn($condition) => $condition->toSql(), $this->conditions));
         }
+
         return $sql;
     }
 

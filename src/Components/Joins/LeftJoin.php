@@ -42,8 +42,8 @@ class LeftJoin implements Join
 
     public function toSql(): string
     {
-        $column = AliasResolver::resolve($this->table, $this->column);
-        $refrence = AliasResolver::resolve($this->parentTable, $this->reference);
+        $column = AliasResolver::resolve($this->table, $this->column, true);
+        $refrence = AliasResolver::resolve($this->parentTable, $this->reference, true);
         
         return "LEFT JOIN {$this->table->toSql()} ON {$column} = {$refrence}";
     }

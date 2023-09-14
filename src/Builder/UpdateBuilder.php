@@ -3,9 +3,12 @@
 namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
+use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Components\Where;
+use Didslm\QueryBuilder\Queries\QueryType;
+use Didslm\QueryBuilder\Queries\Update;
 
-class UpdateBuilder implements QueryBuilder
+class UpdateBuilder implements Builder
 {
     private string $table;
     private array $columns;
@@ -18,13 +21,13 @@ class UpdateBuilder implements QueryBuilder
         $this->table = $table;
     }
 
-    public function addColumns(array $columns): UpdateBuilder
+    public function addColumns(array $columns):self
     {
         $this->columns = $columns;
         return $this;
     }
 
-    public function addValues(array $values): UpdateBuilder
+    public function addValues(array $values):self
     {
         if (count($this->columns) !== count($values)) {
             throw new \Exception('Number of columns and values do not match');
@@ -34,25 +37,48 @@ class UpdateBuilder implements QueryBuilder
         return $this;
     }
 
-    public function where(string $column, mixed $value, ?string $operator = null): UpdateBuilder
+    public function where(string $column, mixed $value, ?string $operator = null):self
     {
         $this->wheres[] = new Where($column, $value, $operator);
         return $this;
     }
 
-    public function innerJoin(string $table, string $column, string $reference): UpdateBuilder
+    public function innerJoin(string $table, string $column, string $reference):self
     {
         $this->joins[] = new InnerJoin($table, $column, $reference);
         return $this;
     }
-    public function table(string $table): UpdateBuilder
+    public function table(string $table):self
     {
         return new static($table);
     }
 
-    public static function into(string $table): UpdateBuilder
+    public static function into(string $table):self
     {
         return new static($table);
+    }
+
+    public function build(): Update
+    {
+        $update = new Update(new Table($this->table));
+
+        foreach ($this->columns as $column) {
+            $update->addColumn($column);
+        }
+
+        foreach ($this->values as $value) {
+            $update->addValue($value);
+        }
+
+        foreach ($this->wheres as $where) {
+            $update->addWhere($where);
+        }
+
+        foreach ($this->joins as $join) {
+            $update->addJoin($join);
+        }
+
+        return $update;
     }
 
     public function toSql():string

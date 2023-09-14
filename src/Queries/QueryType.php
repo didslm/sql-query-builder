@@ -4,5 +4,6 @@ namespace Didslm\QueryBuilder\Queries;
 
 interface QueryType
 {
+    public function __toString(): string;
     public function toSql(): string;
 }
