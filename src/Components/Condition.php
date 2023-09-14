@@ -8,6 +8,7 @@ interface Condition
         '=',
         '>',
         '<',
+        '!=',
         '>=',
         '<=',
         '<>',
@@ -19,6 +20,13 @@ interface Condition
         'NOT BETWEEN',
         'IS NULL',
         'IS NOT NULL',
+    ];
+
+    const DEFAULT_OPERATORS_FOR_NULL = [
+        '=' => 'IS NULL',
+        '<>' => 'IS NOT NULL',
+        '!=' => 'IS NOT NULL',
+        '<' => 'IS NOT NULL',
     ];
 
     public function getColumn(): string;

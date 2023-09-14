@@ -2,17 +2,16 @@
 
 namespace Didslm\QueryBuilder\Components;
 
-use Didslm\QueryBuilder\QueryBuilderInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
 class Where implements Condition
 {
     private const DEFAULT_OPERATOR = '=';
     private string $field;
-    private string $value;
+    private string|float|int|null $value;
     private string $operator;
 
-    public function __construct(string $field, string $value, string $operator = self::DEFAULT_OPERATOR)
+    public function __construct(string $field, string|float|int|null $value, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
         $this->value = $value;
@@ -45,6 +44,14 @@ class Where implements Condition
 
     public function toSql(): string
     {
+        if (is_null($this->value)) {
+            return sprintf('%s %s', $this->field, self::DEFAULT_OPERATORS_FOR_NULL[$this->operator] ?? $this->operator);
+        }
+
+        if (is_numeric($this->value)) {
+            return sprintf('%s %s %s', $this->field, $this->operator, $this->value);
+        }
+
         if (str_contains($this->value, ':') && strlen($this->value) > 1) {
             return sprintf('%s %s %s', $this->field, $this->operator, Cleaner::escapeString($this->value));
         }

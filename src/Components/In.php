@@ -17,6 +17,11 @@ class In implements Condition
         $this->values = $values;
         $this->operator = $operator;
 
+        if (empty($values)) {
+            throw new \InvalidArgumentException('Array cannot be empty');
+            
+        }
+
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));
         }
