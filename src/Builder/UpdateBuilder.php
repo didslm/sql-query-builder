@@ -3,7 +3,7 @@
 namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\Condition;
-use Didslm\QueryBuilder\Components\InnerJoin;
+use Didslm\QueryBuilder\Components\Joins\InnerJoin;
 
 class UpdateBuilder implements QueryBuilder
 {

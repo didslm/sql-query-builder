@@ -5,6 +5,7 @@ namespace Didslm\QueryBuilder\Tests\Builder;
 
 use Didslm\QueryBuilder\Builder\SelectBuilder;
 use Didslm\QueryBuilder\Components\In;
+use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Select;
 use Didslm\QueryBuilder\Components\Where;
@@ -82,7 +83,7 @@ class SelectQueryBuilderTest extends TestCase
     public function testLeftJoinQuery()
     {
         $sql = SelectBuilder::from('users')
-            ->leftJoin('posts', 'users.id', 'posts.user_id');
+            ->join(new LeftJoin('posts', 'users.id', 'posts.user_id'));
 
         $this->assertEquals("SELECT users.* FROM users LEFT JOIN posts ON users.id = posts.user_id", $sql);
     }

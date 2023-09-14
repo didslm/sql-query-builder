@@ -3,10 +3,10 @@
 namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\Condition;
-use Didslm\QueryBuilder\Components\InnerJoin;
-use Didslm\QueryBuilder\Components\LeftJoin;
+use Didslm\QueryBuilder\Components\Joins\InnerJoin;
+use Didslm\QueryBuilder\Components\Joins\Join;
+use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\OrderBy;
-use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Select;
 
 class SelectBuilder implements SelectQueryBuilderInterface
@@ -47,6 +47,12 @@ class SelectBuilder implements SelectQueryBuilderInterface
     public function where(Condition $condition): QueryBuilder
     {
         $this->wheres[] = $condition;
+        return $this;
+    }
+
+    public function join(Join $join) : QueryBuilder
+    {
+        $this->joins[] = $join;
         return $this;
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Didslm\QueryBuilder\Components;
+namespace Didslm\QueryBuilder\Components\Joins;
 
 class InnerJoin
 {
