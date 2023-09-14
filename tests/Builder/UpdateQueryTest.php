@@ -75,6 +75,6 @@ WHERE t1.a = 'blah';
             ->toSql();
 
 
-        $this->assertEquals("UPDATE t1 INNER JOIN table2 ON table2.user_id = t1.id INNER JOIN table3 ON table3.order_id = table2.id SET t1.column1 = 'value1' WHERE t1.id = '1' AND table3.name = 'diar'", $sql);
+        $this->assertEquals("UPDATE t1 INNER JOIN table2 ON table2.user_id = t1.id INNER JOIN table3 ON table3.order_id = table2.id SET t1.column1 = 'value1' WHERE t1.id = 1 AND table3.name = 'diar'", $sql);
     }
 }

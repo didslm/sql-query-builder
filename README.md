@@ -30,10 +30,10 @@ use Didslm\QueryBuilder\SelectQueryBuilder;
 
 $query = SelectQueryBuilder::from('users')
     ->select('*')
-    ->where('age', '>', 18)
+    ->where(new Where('age', 18))
     ->toSql();
 
-echo $query;  // Outputs: SELECT * FROM users WHERE age > 18
+echo $query;  // Outputs: SELECT * FROM users WHERE age = 18
 ```
 
 ### Complex JOIN Query
@@ -41,10 +41,12 @@ echo $query;  // Outputs: SELECT * FROM users WHERE age > 18
 ```php
 $query = SelectQueryBuilder::from('users')
     ->select('*')
-    ->where('age', '>', 18)
+    ->join(new LeftJoin('posts', 'users.id', 'posts.user_id'))
+    ->where(new Where('users.age', '>', 18))
+    ->where(new Where('posts.published', true))
     ->toSql();
 
-echo $query;  // Outputs: SELECT * FROM users WHERE age > 18
+echo $query;  // Outputs: SELECT * FROM users JOIN posts ON users.id = posts.user_id WHERE users.age > 18 AND posts.published = true
 ```
 
 
@@ -67,5 +69,3 @@ Please make sure to update the tests as appropriate.
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ---
-
-You'll need to replace placeholders such as `your-vendor-name` with appropriate values that fit your project. The provided examples are also basic and should be replaced or extended based on the actual functionality of your package.

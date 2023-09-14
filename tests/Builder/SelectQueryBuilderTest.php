@@ -31,7 +31,7 @@ class SelectQueryBuilderTest extends TestCase
                 '>'
             ))->toSql();
 
-        $this->assertEquals("SELECT users.* FROM users WHERE age > '18'", $query);
+        $this->assertEquals("SELECT users.* FROM users WHERE age > 18", $query);
     }
 
     public function testSelectWithMultipleWhere()
@@ -44,7 +44,7 @@ class SelectQueryBuilderTest extends TestCase
             ->where(Where::create('status', 'active'))
             ->toSql();
 
-        $this->assertEquals("SELECT users.* FROM users WHERE age > '18' AND status = 'active'", $query);
+        $this->assertEquals("SELECT users.* FROM users WHERE age > 18 AND status = 'active'", $query);
     }
 
     public function testSelectWithOrder()
