@@ -3,7 +3,7 @@
   "description": "A flexible PHP package to build SQL queries using the builder pattern.",
   "type": "library",
   "require": {
-    "php": "^7.4 || ^8.0"
+    "php": "^8.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

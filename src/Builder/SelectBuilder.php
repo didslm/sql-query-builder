@@ -2,13 +2,12 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
+use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Components\InnerJoin;
 use Didslm\QueryBuilder\Components\LeftJoin;
 use Didslm\QueryBuilder\Components\OrderBy;
 use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Select;
-use Didslm\QueryBuilder\Components\Where;
-use Didslm\QueryBuilder\QueryBuilderInterface;
 
 class SelectBuilder implements SelectQueryBuilderInterface
 {
@@ -45,15 +44,9 @@ class SelectBuilder implements SelectQueryBuilderInterface
         return $this;
     }
 
-    public function where(string $field, string $value, string $operator = '='): QueryBuilder
+    public function where(Condition $condition): QueryBuilder
     {
-        $this->wheres[] = new Where($field, $value, $operator);
-        return $this;
-    }
-
-    public function whereRegex(string $column, string $pattern): QueryBuilder
-    {
-        $this->wheres[] = new Regex($column, $pattern);
+        $this->wheres[] = $condition;
         return $this;
     }
 

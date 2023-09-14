@@ -2,8 +2,8 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
+use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Components\InnerJoin;
-use Didslm\QueryBuilder\Components\Where;
 
 class UpdateBuilder implements QueryBuilder
 {
@@ -34,9 +34,9 @@ class UpdateBuilder implements QueryBuilder
         return $this;
     }
 
-    public function where(string $field, string $value, string $operator = '='): UpdateBuilder
+    public function where(Condition $condition): UpdateBuilder
     {
-        $this->wheres[] = new Where($field, $value, $operator);
+        $this->wheres[] = $condition;
         return $this;
     }
 
@@ -69,7 +69,7 @@ class UpdateBuilder implements QueryBuilder
             $column = $this->columns[$i];
             $value = $this->values[$i];
 
-            $setStatements[] = (strpos($value, ':') === 0)
+            $setStatements[] = (str_starts_with($value, ':'))
                 ? "$column = $value"
                 : "$column = '" . addslashes($value) . "'";
         }

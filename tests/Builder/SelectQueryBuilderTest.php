@@ -4,7 +4,10 @@ namespace Didslm\QueryBuilder\Tests\Builder;
 
 
 use Didslm\QueryBuilder\Builder\SelectBuilder;
+use Didslm\QueryBuilder\Components\In;
+use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Select;
+use Didslm\QueryBuilder\Components\Where;
 use PHPUnit\Framework\TestCase;
 
 
@@ -22,7 +25,11 @@ class SelectQueryBuilderTest extends TestCase
     {
         $query = SelectBuilder::from('users')
             ->select(Select::ALL)
-            ->where('age', 18, '>')->toSql();
+            ->where(Where::create(
+                'age',
+                18,
+                '>'
+            ))->toSql();
 
         $this->assertEquals("SELECT users.* FROM users WHERE age > '18'", $query);
     }
@@ -33,8 +40,8 @@ class SelectQueryBuilderTest extends TestCase
 
         $query = SelectBuilder::from('users')
             ->select(Select::ALL)
-            ->where('age', 18, '>')
-            ->where('status', 'active', '=')
+            ->where(Where::create('age', 18, '>'))
+            ->where(Where::create('status', 'active'))
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users WHERE age > '18' AND status = 'active'", $query);
@@ -55,7 +62,7 @@ class SelectQueryBuilderTest extends TestCase
     {
         $query = SelectBuilder::from('users')
             ->select(Select::ALL)
-            ->whereRegex('name', implode('|', ['a', 'z']))
+            ->where(new Regex('name', 'a|z'))
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP 'a|z'", $query);
@@ -65,8 +72,8 @@ class SelectQueryBuilderTest extends TestCase
     {
         $sql = SelectBuilder::from('candidates')
             ->select(Select::ALL)
-            ->where('title', ':title', 'REGEXP')
-            ->where('level', ':level', 'REGEXP')
+            ->where(new Regex('title', ':title'))
+            ->where(Regex::create('level', ':level'))
             ->toSql();
 
         $this->assertEquals("SELECT candidates.* FROM candidates WHERE title REGEXP :title AND level REGEXP :level", $sql);
@@ -103,8 +110,8 @@ class SelectQueryBuilderTest extends TestCase
     {
         $sql = SelectBuilder::from('users')
             ->innerJoin('posts', 'users.id', 'posts.user_id')
-            ->where('posts.status', 'published', '=')
-            ->where('posts.published_at', '2020-01-01', '>')
+            ->where(Where::create('posts.status', 'published'))
+            ->where(Where::create('posts.published_at', '2020-01-01', '>'))
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users INNER JOIN posts ON users.id = posts.user_id WHERE posts.status = 'published' AND posts.published_at > '2020-01-01'", $sql);
@@ -113,7 +120,7 @@ class SelectQueryBuilderTest extends TestCase
     public function testSelectWithRegexConditionUsingPlaceholders()
     {
         $sql = SelectBuilder::from('users')
-            ->where('name', ':regex', 'REGEXP')
+            ->where(Regex::create('name', ':regex'))
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP :regex", $sql);
@@ -122,12 +129,21 @@ class SelectQueryBuilderTest extends TestCase
     public function testSelectWithRegexMultipleConditionsWithPlaceholders()
     {
         $sql = SelectBuilder::from('users')
-            ->where('name', ':regex', 'REGEXP')
-            ->where('email', ':regex', 'REGEXP')
+            ->where(Regex::create('name', ':regex'))
+            ->where(Regex::create('email', ':regex'))
             ->toSql();
 
         $this->assertEquals("SELECT users.* FROM users WHERE name REGEXP :regex AND email REGEXP :regex", $sql);
 
+    }
+
+    public function testSelectWithInCondition()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where(In::with('name', ['John', 'Doe']))
+            ->toSql();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name IN ('John', 'Doe')", $sql);
     }
 
 }
