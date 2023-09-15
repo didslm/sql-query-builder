@@ -2,7 +2,6 @@
 
 namespace Didslm\QueryBuilder\Components;
 
-use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 
 /**
@@ -11,12 +10,8 @@ use Didslm\QueryBuilder\Interface\ConditionInterface;
  * @author Ibnul Mutaki <ibnuu@gmail.com>
  */
 
-class Like implements ConditionInterface {
+class Like extends AbstractCondition implements ConditionInterface {
     private const DEFAULT_OPERATOR = 'LIKE';
-
-    private string $field;
-    private string $value;
-    private string $operator;
 
     public function __construct(string $field, string $value, string $operator = self::DEFAULT_OPERATOR)
     {
@@ -30,21 +25,6 @@ class Like implements ConditionInterface {
         return new self($field, $value, $operator);
     }
 
-    public function getColumn(): string
-    {
-        return $this->field;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    public function getOperator(): string
-    {
-        return $this->operator;
-    }
-
     public function toSql(): string
     {
         $value = str_replace('*', '%', $this->value);
@@ -53,10 +33,5 @@ class Like implements ConditionInterface {
         }
 
         return sprintf("%s %s '%s'", $this->field, $this->operator, $value);
-    }
-
-    public function __toString(): string
-    {
-        return $this->toSql();
     }
 }

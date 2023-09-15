@@ -12,10 +12,10 @@ use Didslm\QueryBuilder\Interface\ConditionInterface;
 class NotLike extends AbstractCondition implements ConditionInterface {
     private const DEFAULT_OPERATOR = 'NOT LIKE';
 
-    public function __construct(string $field, string $value, string $operator = self::DEFAULT_OPERATOR)
+    public function __construct(string $field, string $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
-        $this->value = $value;
+        $this->value = $values;
         $this->operator = $operator;
     }
 

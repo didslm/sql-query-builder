@@ -5,17 +5,14 @@ namespace Didslm\QueryBuilder\Components;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class In implements ConditionInterface
+class In extends AbstractCondition implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'IN';
-    private string $field;
-    private array $values;
-    private string $operator;
 
     public function __construct(string $field, array $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
-        $this->values = $values;
+        $this->value = $values;
         $this->operator = $operator;
 
         if (empty($values)) {
@@ -32,20 +29,9 @@ class In implements ConditionInterface
     {
         return new self($field, $values, $operator);
     }
-    public function __toString(): string
-    {
-        return $this->toSql();
-    }
-
     public function toSql(): string
     {
         return sprintf('%s %s (%s)', $this->field, $this->operator, $this->getValue());
-    }
-
-
-    public function getColumn(): string
-    {
-        return $this->field;
     }
 
     public function getValue(): string
@@ -56,13 +42,8 @@ class In implements ConditionInterface
             } else {
                 return sprintf("'%s'", Cleaner::escapeString($value));
             }
-        }, $this->values);
+        }, $this->value);
 
         return implode(', ', $values);
-    }
-
-    public function getOperator(): string
-    {
-        return $this->operator;
     }
 }

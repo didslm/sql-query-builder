@@ -6,12 +6,9 @@ use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class Where implements GroupConditionInterface
+class Where extends AbstractCondition implements GroupConditionInterface
 {
     private const DEFAULT_OPERATOR = '=';
-    private string $field;
-    private string|float|int|null $value;
-    private string $operator;
 
     private array $conditions = [];
 
@@ -25,21 +22,6 @@ class Where implements GroupConditionInterface
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));
         }
-    }
-
-    public function getColumn(): string
-    {
-        return $this->field;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    public function getOperator(): string
-    {
-        return $this->operator;
     }
 
     public function toSql(): string
@@ -70,11 +52,6 @@ class Where implements GroupConditionInterface
             return sprintf('%s %s %s', $this->field, $this->operator, Cleaner::escapeString($this->value));
         }
         return sprintf("%s %s '%s'", $this->field, $this->operator, Cleaner::escapeString($this->value));
-    }
-
-    public function __toString(): string
-    {
-        return $this->toSql();
     }
 
     public function getConditions(): array

@@ -14,11 +14,10 @@ use Didslm\QueryBuilder\Utilities\Cleaner;
 class NotIn extends AbstractCondition implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'NOT IN';
-    private array $values;
     public function __construct(string $field, array $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
-        $this->values = $values;
+        $this->value = $values;
         $this->operator = $operator;
 
         if (empty($values)) {
@@ -49,7 +48,7 @@ class NotIn extends AbstractCondition implements ConditionInterface
             } else {
                 return sprintf("'%s'", Cleaner::escapeString($value));
             }
-        }, $this->values);
+        }, $this->value);
 
         return implode(', ', $values);
     }

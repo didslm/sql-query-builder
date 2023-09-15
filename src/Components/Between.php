@@ -10,17 +10,14 @@ use Didslm\QueryBuilder\Utilities\Cleaner;
  *
  * @author Ibnul Mutaki <ibnuu@gmail.com>
  */
-class Between implements ConditionInterface
+class Between extends AbstractCondition implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'BETWEEN';
-    private string $field;
-    private array $values;
-    private string $operator;
 
     public function __construct(string $field, array $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
-        $this->values = $values;
+        $this->value = $values;
         $this->operator = $operator;
 
         if (empty($values)) {
@@ -44,20 +41,10 @@ class Between implements ConditionInterface
     {
         return new self($field, $values, $operator);
     }
-    public function __toString(): string
-    {
-        return $this->toSql();
-    }
 
     public function toSql(): string
     {
         return sprintf('%s %s %s', $this->field, $this->operator, $this->getValue());
-    }
-
-
-    public function getColumn(): string
-    {
-        return $this->field;
     }
 
     public function getValue(): string
@@ -68,13 +55,8 @@ class Between implements ConditionInterface
             } else {
                 return sprintf("'%s'", Cleaner::escapeString($value));
             }
-        }, $this->values);
+        }, $this->value);
 
         return implode(' AND ', $values);
-    }
-
-    public function getOperator(): string
-    {
-        return $this->operator;
     }
 }

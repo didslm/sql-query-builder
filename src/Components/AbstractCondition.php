@@ -11,7 +11,7 @@ namespace Didslm\QueryBuilder\Components;
 abstract class AbstractCondition
 {
     protected string $field;
-    protected string $value;
+    protected string|float|int|null|array $value;
     protected string $operator;
 
     public function getColumn(): string
