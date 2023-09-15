@@ -4,9 +4,11 @@ namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\GroupCondition;
 use Didslm\QueryBuilder\Components\In;
+use Didslm\QueryBuilder\Components\Joins\FullJoin;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\Joins\LeftJoin;
+use Didslm\QueryBuilder\Components\Joins\RightJoin;
 use Didslm\QueryBuilder\Components\Like;
 use Didslm\QueryBuilder\Components\OrderBy;
 use Didslm\QueryBuilder\Components\OrImlp;
@@ -108,9 +110,23 @@ class SelectBuilder implements Builder
         return $this;
     }
 
+        public function rightJoin(string $table, string $column, string $reference): self
+    {
+        $this->joins[] = new RightJoin($table, $column, $reference);
+
+        return $this;
+    }
+
     public function innerJoin(string $table, string $column, string $reference): self
     {
         $this->joins[] = new InnerJoin($table, $column, $reference);
+
+        return $this;
+    }
+
+    public function fullJoin(string $table, string $column, string $reference): self
+    {
+        $this->joins[] = new FullJoin($table, $column, $reference);
 
         return $this;
     }

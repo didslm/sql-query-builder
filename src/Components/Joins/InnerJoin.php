@@ -38,8 +38,10 @@ class InnerJoin implements Join
 
     public function toSql(): string
     {
-        $column = AliasResolver::resolve($this->table, $this->column);
-        $refrence = AliasResolver::resolve($this->parentTable, $this->foreignColumn);
-        return sprintf('INNER JOIN %s ON %s = %s', $this->table->getTable(), $column, $refrence);
+        $column = AliasResolver::resolve($this->table, $this->column, true);
+        $refrence = AliasResolver::resolve($this->parentTable, $this->foreignColumn, true);
+
+        return "INNER JOIN {$this->table->toSql()} ON {$column} = {$refrence}";
+
     }
 }

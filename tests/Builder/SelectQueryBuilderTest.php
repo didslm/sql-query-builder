@@ -116,7 +116,7 @@ class SelectQueryBuilderTest extends TestCase
             ->where('posts.status', 'published')
             ->where('posts.published_at', '2020-01-01', '>')
             ->build();
-            
+
 
         $this->assertEquals("SELECT users.* FROM users INNER JOIN posts ON users.id = posts.user_id WHERE posts.status = 'published' AND posts.published_at > '2020-01-01'", $sql->toSql());
     }
@@ -161,6 +161,33 @@ class SelectQueryBuilderTest extends TestCase
             ->build();
 
         $this->assertEquals("SELECT users.* FROM users WHERE (name = 'John' AND age = 18 AND email = 'selimi') OR (name = 'test' AND email = 'selimi')", $sql->toSql());
+    }
+
+    public function testSelectWithLikeBeginCondition()
+    {
+        $sql = SelectBuilder::from('users')
+            ->like('name', "doe%")
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name LIKE 'doe%'", $sql->toSql());
+    }
+
+    public function testSelectWithLikeEndCondition()
+    {
+        $sql = SelectBuilder::from('users')
+            ->like('name', "%doe")
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name LIKE '%doe'", $sql->toSql());
+    }
+
+    public function testSelectWithLikeContainsCondition()
+    {
+        $sql = SelectBuilder::from('users')
+            ->like('name', "%doe%")
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE name LIKE '%doe%'", $sql->toSql());
     }
 
 }
