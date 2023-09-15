@@ -8,6 +8,13 @@ class Regex extends AbstractCondition implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'REGEXP';
 
+    /**
+     * Create a new Regex Contition instance.
+     *
+     * @param string $column column to query
+     * @param string $pattern regex patern to apply                     $loaderName
+     */
+
     public function __construct(string $column, string $pattern)
     {
         $this->field = $column;
