@@ -181,13 +181,15 @@ class SelectQueryBuilderTest extends TestCase
         $this->assertEquals("SELECT users.* FROM users WHERE name LIKE '%doe'", $sql->toSql());
     }
 
-    public function testSelectWithLikeContainsCondition()
+    public function testInnerJoinWithSubQuery()
     {
+        $subQuery = SelectBuilder::from("test");
+
         $sql = SelectBuilder::from('users')
-            ->like('name', "%doe%")
+            ->innerJoin("({$subQuery->build()->toSql()}) as test", 'users.id', 'test.user_id')
+            ->where('test.status', 'published')
             ->build();
 
-        $this->assertEquals("SELECT users.* FROM users WHERE name LIKE '%doe%'", $sql->toSql());
+        $this->assertEquals("SELECT users.* FROM users INNER JOIN (SELECT test.* FROM test) as test ON users.id = test.user_id WHERE test.status = 'published'", $sql->toSql());
     }
-
 }
