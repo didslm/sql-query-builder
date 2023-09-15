@@ -2,7 +2,7 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-use Didslm\QueryBuilder\Components\GroupCondition;
+use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Components\In;
 use Didslm\QueryBuilder\Components\Joins\FullJoin;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
@@ -62,7 +62,7 @@ class SelectBuilder implements Builder
     public function and(string $column, mixed $value, ?string $operator = null): self
     {
         $lastWhere = array_pop($this->wheres);
-        if ($lastWhere instanceof GroupCondition) {
+        if ($lastWhere instanceof GroupConditionInterface) {
             $lastWhere->addCondition(new Where($column, $value, $operator));
             $this->wheres[] = $lastWhere;
         } else {

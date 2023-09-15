@@ -4,6 +4,7 @@ namespace Didslm\QueryBuilder\Tests\Builder;
 
 
 use Didslm\QueryBuilder\Builder\UpdateBuilder;
+use Didslm\QueryBuilder\SqlQueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
 class UpdateQueryTest extends TestCase
@@ -18,7 +19,7 @@ class UpdateQueryTest extends TestCase
 
     public function testMismatchColumnsAndValuesThrowsException()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(SqlQueryBuilderException::class);
         $this->expectExceptionMessage('Number of columns and values do not match');
 
         $builder = new UpdateBuilder('test_table');

@@ -2,9 +2,11 @@
 
 namespace Didslm\QueryBuilder\Components;
 
+use Didslm\QueryBuilder\Interface\ConditionInterface;
+use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class Where implements GroupCondition
+class Where implements GroupConditionInterface
 {
     private const DEFAULT_OPERATOR = '=';
     private string $field;
@@ -80,7 +82,7 @@ class Where implements GroupCondition
         return $this->conditions;
     }
 
-    public function addCondition(Condition $condition): self
+    public function addCondition(ConditionInterface $condition): self
     {
         $this->conditions[] = $condition;
         return $this;

@@ -2,7 +2,7 @@
 
 namespace Didslm\QueryBuilder\Queries;
 
-use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
@@ -30,7 +30,7 @@ class Update implements QueryType
         return $this;
     }
 
-    public function addWhere(Condition $condition): Update
+    public function addWhere(ConditionInterface $condition): Update
     {
         $this->conditions[] = $condition;
         return $this;

@@ -5,6 +5,12 @@ namespace Didslm\QueryBuilder\Components\Joins;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 
+/**
+ * An implementation for Right Join.
+ *
+ * @author Ibnul Mutaki <ibnuu@gmail.com>
+ */
+
 class RightJoin implements Join
 {
     private ?Table $parentTable = null;

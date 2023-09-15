@@ -2,7 +2,7 @@
 
 namespace Didslm\QueryBuilder\Queries;
 
-use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\OrderBy;
 use Didslm\QueryBuilder\Components\OrImlp;
@@ -24,7 +24,7 @@ class Select implements QueryType
         return $this;
     }
 
-    public function addWhere(Condition $condition): Select
+    public function addWhere(ConditionInterface $condition): Select
     {
         $this->conditions[] = $condition;
         return $this;

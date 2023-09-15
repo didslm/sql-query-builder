@@ -2,9 +2,11 @@
 
 namespace Didslm\QueryBuilder\Components;
 
+use Didslm\QueryBuilder\Interface\ConditionInterface;
+use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class OrImlp implements GroupCondition
+class OrImlp implements GroupConditionInterface
 {
     private const DEFAULT_OPERATOR = '=';
     private array $conditions = [];
@@ -25,7 +27,7 @@ class OrImlp implements GroupCondition
         return $this->conditions;
     }
 
-    public function addCondition(Condition $condition): self
+    public function addCondition(ConditionInterface $condition): self
     {
         $this->conditions[] = $condition;
         return $this;

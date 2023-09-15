@@ -1,8 +1,8 @@
 <?php
 
-namespace Didslm\QueryBuilder\Components;
+namespace Didslm\QueryBuilder\Interface;
 
-interface Condition
+interface ConditionInterface
 {
     const ALL_OPERATORS = [
         '=',

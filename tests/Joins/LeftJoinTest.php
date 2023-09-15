@@ -3,7 +3,6 @@
 namespace Didslm\QueryBuilder\Tests\Joins;
 use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\Table;
-use Didslm\QueryBuilder\Tests\Builder\SelectQueryBuilderTest;
 use PHPUnit\Framework\TestCase;
 
 class LeftJoinTest extends TestCase

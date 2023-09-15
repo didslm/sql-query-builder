@@ -5,6 +5,12 @@ namespace Didslm\QueryBuilder\Components\Joins;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 
+/**
+ * An implementation for Full Join
+ *
+ * @author Ibnul Mutaki <ibnuu@gmail.com>
+ */
+
 class FullJoin implements Join
 {
     private ?Table $parentTable = null;
