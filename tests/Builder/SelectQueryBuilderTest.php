@@ -150,4 +150,17 @@ class SelectQueryBuilderTest extends TestCase
         $this->assertEquals("SELECT users.* FROM users WHERE name IN ('John', 'Doe')", $sql->toSql());
     }
 
+    public function testSelectWithGroupedConditions()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where('name', 'John')
+            ->and('age', 18)
+            ->and('email', 'selimi')
+            ->or('name', 'test')
+            ->and('email', 'selimi')
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE (name = 'John' AND age = 18 AND email = 'selimi') OR (name = 'test' AND email = 'selimi')", $sql->toSql());
+    }
+
 }

@@ -4,12 +4,14 @@ namespace Didslm\QueryBuilder\Components;
 
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class Where implements Condition
+class Where implements GroupCondition
 {
     private const DEFAULT_OPERATOR = '=';
     private string $field;
     private string|float|int|null $value;
     private string $operator;
+
+    private array $conditions = [];
 
     public function __construct(string $field, string|float|int|null $value, ?string $operator = null)
     {
@@ -21,11 +23,6 @@ class Where implements Condition
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));
         }
-    }
-
-    public static function create(string $field, string $value, string $operator = self::DEFAULT_OPERATOR): Condition
-    {
-        return new self($field, $value, $operator);
     }
 
     public function getColumn(): string
@@ -45,6 +42,20 @@ class Where implements Condition
 
     public function toSql(): string
     {
+        $sql = $this->buildCondition();
+        if (count($this->conditions) === 0) {
+            return $sql;
+        }
+
+        foreach ($this->conditions as $condition) {
+            $sql = sprintf('%s AND %s', $sql, $condition->toSql());
+        }
+
+        return sprintf('(%s)', $sql);
+    }
+
+    private function buildCondition(): string
+    {
         if (is_null($this->value)) {
             return sprintf('%s %s', $this->field, self::DEFAULT_OPERATORS_FOR_NULL[$this->operator] ?? $this->operator);
         }
@@ -62,5 +73,16 @@ class Where implements Condition
     public function __toString(): string
     {
         return $this->toSql();
+    }
+
+    public function getConditions(): array
+    {
+        return $this->conditions;
+    }
+
+    public function addCondition(Condition $condition): self
+    {
+        $this->conditions[] = $condition;
+        return $this;
     }
 }

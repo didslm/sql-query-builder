@@ -5,6 +5,7 @@ namespace Didslm\QueryBuilder\Queries;
 use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\OrderBy;
+use Didslm\QueryBuilder\Components\OrImlp;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 
@@ -57,8 +58,13 @@ class Select implements QueryType
         }
 
         if (count($this->conditions) > 0) {
-            $sql .= ' WHERE ';
-            $sql .= implode(' AND ', array_map(fn($condition) => $condition->toSql(), $this->conditions));
+            $first = array_shift($this->conditions);
+            $sql .= ' WHERE ' . $first->toSql();
+
+            foreach ($this->conditions as $condition) {
+                $andOr = $condition instanceof OrImlp ? ' OR ' : ' AND ';
+                $sql .= $andOr.$condition->toSql();
+            }
         }
 
         if (count($this->orders) > 0) {

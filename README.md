@@ -36,7 +36,7 @@ $query = SelectQueryBuilder::from('users')
 echo $query;  // Outputs: SELECT * FROM users WHERE age = 18
 ```
 
-### Complex JOIN Query
+### Complex Query
 
 ```php
 $query = SelectQueryBuilder::from('users')
@@ -49,6 +49,19 @@ $query = SelectQueryBuilder::from('users')
 echo $query;  // Outputs: SELECT * FROM users JOIN posts ON users.id = posts.user_id WHERE users.age > 18 AND posts.published = true
 ```
 
+### Grouped conditions
+
+```php
+$sql = SelectBuilder::from('users')
+    ->where('name', 'John')
+    ->and('age', 18)
+    ->and('email', 'selimi')
+    ->or('name', 'test')
+    ->and('email', 'selimi')
+    ->build();
+
+echo $sql;  // Outputs: SELECT * FROM users WHERE (name = 'John' AND age = 18 AND email = 'selimi') OR (name = 'test' AND email = 'selimi')
+```
 
 ## Testing
 

@@ -51,4 +51,14 @@ class WhereTest extends TestCase {
         $this->assertEquals("age IS NOT NULL", $where->toSql());
     }
 
+    public function testGroupCondition(): void
+    {
+        $where = new Where('age', 18);
+        $where->addCondition(
+            new Where('name', 'John Doe')
+        )->addCondition(
+            new Where('email', 'didslm')
+        );
+        $this->assertEquals("(age = 18 AND name = 'John Doe' AND email = 'didslm')", $where->toSql());
+    }
 }

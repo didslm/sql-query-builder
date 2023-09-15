@@ -2,12 +2,14 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
+use Didslm\QueryBuilder\Components\GroupCondition;
 use Didslm\QueryBuilder\Components\In;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\Like;
 use Didslm\QueryBuilder\Components\OrderBy;
+use Didslm\QueryBuilder\Components\OrImlp;
 use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Components\Where;
@@ -54,7 +56,27 @@ class SelectBuilder implements Builder
         $this->wheres[] = new Where($column, $value, $operator);
         return $this;
     }
-    
+
+    public function and(string $column, mixed $value, ?string $operator = null): self
+    {
+        $lastWhere = array_pop($this->wheres);
+        if ($lastWhere instanceof GroupCondition) {
+            $lastWhere->addCondition(new Where($column, $value, $operator));
+            $this->wheres[] = $lastWhere;
+        } else {
+            $this->wheres[] = new Where($column, $value, $operator);
+        }
+
+        return $this;
+
+    }
+
+    public function or(string $column, mixed $value, ?string $operator = null): self
+    {
+        $this->wheres[] = new OrImlp($column, $value, $operator);
+        return $this;
+    }
+
     public function in(string $column, array $values): self
     {
         $this->wheres[] = new In($column, $values);
