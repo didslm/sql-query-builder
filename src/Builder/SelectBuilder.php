@@ -82,17 +82,8 @@ class SelectBuilder implements Builder
         if($column instanceof Closure) {
 
             $_raw = $this->whereRawCallback($column);
-
-            // var_dump($lastWhere);
-
-            // if ($lastWhere instanceof GroupConditionInterface) {
-                // $lastWhere->addCondition(new WhereRaw($_raw));
-                $this->wheres[] = $lastWhere;
-                $this->wheres[] = new WhereRaw($_raw);
-            // } else {
-                // $this->wheres[] = $lastWhere;
-                // $this->wheres[] = new WhereRaw($_raw);
-            // }
+            $this->wheres[] = $lastWhere;
+            $this->wheres[] = new WhereRaw($_raw);
 
         } else {
 
