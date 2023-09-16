@@ -2,15 +2,16 @@
 
 namespace Didslm\QueryBuilder\Queries;
 
-use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Components\ConditionInterface;
+use Didslm\QueryBuilder\Components\GroupCondition;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\OrderBy;
-use Didslm\QueryBuilder\Components\OrImlp;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 
 class Select implements QueryType
 {
+    const DEFAULT_OPERATOR = 'AND';
     private array $conditions = [];
     private array $joins = [];
     private array $columns = [];
@@ -24,9 +25,15 @@ class Select implements QueryType
         return $this;
     }
 
-    public function addWhere(Condition $condition): Select
+    public function addCondition(ConditionInterface $condition): Select
     {
         $this->conditions[] = $condition;
+        return $this;
+    }
+
+    public function addGroup(GroupCondition $groupCondition): self
+    {
+        $this->conditions[] = $groupCondition;
         return $this;
     }
 
@@ -58,13 +65,7 @@ class Select implements QueryType
         }
 
         if (count($this->conditions) > 0) {
-            $first = array_shift($this->conditions);
-            $sql .= ' WHERE ' . $first->toSql();
-
-            foreach ($this->conditions as $condition) {
-                $andOr = $condition instanceof OrImlp ? ' OR ' : ' AND ';
-                $sql .= $andOr.$condition->toSql();
-            }
+            $sql = sprintf('%s WHERE %s', $sql, implode(' AND ', array_map(fn($condition) => $condition->toSql(), $this->conditions)));
         }
 
         if (count($this->orders) > 0) {

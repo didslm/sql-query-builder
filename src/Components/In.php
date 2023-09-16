@@ -4,7 +4,7 @@ namespace Didslm\QueryBuilder\Components;
 
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class In implements Condition
+class In implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'IN';
     private string $field;
@@ -27,7 +27,7 @@ class In implements Condition
         }
     }
 
-    public static function with(string $field, array $values, string $operator = self::DEFAULT_OPERATOR): Condition
+    public static function with(string $field, array $values, string $operator = self::DEFAULT_OPERATOR): ConditionInterface
     {
         return new self($field, $values, $operator);
     }

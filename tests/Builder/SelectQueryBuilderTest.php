@@ -156,11 +156,37 @@ class SelectQueryBuilderTest extends TestCase
             ->where('name', 'John')
             ->and('age', 18)
             ->and('email', 'selimi')
-            ->or('name', 'test')
-            ->and('email', 'selimi')
+            ->and('name', 'test')
             ->build();
 
-        $this->assertEquals("SELECT users.* FROM users WHERE (name = 'John' AND age = 18 AND email = 'selimi') OR (name = 'test' AND email = 'selimi')", $sql->toSql());
+        $this->assertEquals("SELECT users.* FROM users WHERE (name = 'John' AND age = 18 AND email = 'selimi' AND name = 'test')", $sql->toSql());
+    }
+
+    public function testSelectWithGroupedConditionsOr()
+    {
+        $sql = SelectBuilder::from('users')
+            ->or('name', 'John')
+            ->and('age', 18)
+            ->or('email', 'test@gmail.com')
+            ->and('name', 'test')
+            ->build();
+
+
+        $this->assertEquals("SELECT users.* FROM users WHERE (name = 'John' OR age = 18) AND (email = 'test@gmail.com' OR name = 'test')", $sql->toSql());
+    }
+
+    public function testSelectWithGroupedConditionsOrBetween()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where('name', 'John')
+            ->and('age', 18)
+            ->where('email', 'test@gmail.com')
+            ->and('name', 'test')
+            ->orGroup()
+            ->build();
+
+
+        $this->assertEquals("SELECT users.* FROM users WHERE ((name = 'John' AND age = 18) OR (email = 'test@gmail.com' AND name = 'test'))", $sql->toSql());
     }
 
     public function testSelectWithLikeBeginCondition()
@@ -179,6 +205,26 @@ class SelectQueryBuilderTest extends TestCase
             ->build();
 
         $this->assertEquals("SELECT users.* FROM users WHERE name LIKE '%doe'", $sql->toSql());
+    }
+
+    public function testSelectWithMultipleLikeConditions()
+    {
+        $sql = SelectBuilder::from('users')
+            ->where('name', "%doe", 'LIKE')
+            ->and('email', "%doe", 'LIKE')
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE (name LIKE '%doe' AND email LIKE '%doe')", $sql->toSql());
+    }
+
+    public function testSelectWithMultipleOrLikeConditions()
+    {
+        $sql = SelectBuilder::from('users')
+            ->or('name', "%doe", 'LIKE')
+            ->and('email', "%doe", 'LIKE')
+            ->build();
+
+        $this->assertEquals("SELECT users.* FROM users WHERE (name LIKE '%doe' OR email LIKE '%doe')", $sql->toSql());
     }
 
     public function testSelectWithLikeContainsCondition()

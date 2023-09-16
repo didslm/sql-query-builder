@@ -19,9 +19,10 @@ class RightJoin implements Join
         }
     }
 
-    public function setParentTable(Table $table): void
+    public function setParentTable(Table $table): self
     {
         $this->parentTable = $table;
+        return $this;
     }
 
     public function getColumn(): string
@@ -43,8 +44,8 @@ class RightJoin implements Join
     public function toSql(): string
     {
         $column = AliasResolver::resolve($this->table, $this->column, true);
-        $refrence = AliasResolver::resolve($this->parentTable, $this->reference, true);
+        $reference = AliasResolver::resolve($this->parentTable, $this->reference, true);
 
-        return "RIGHT JOIN {$this->table->toSql()} ON {$column} = {$refrence}";
+        return "RIGHT JOIN {$this->table->toSql()} ON {$column} = {$reference}";
     }
 }

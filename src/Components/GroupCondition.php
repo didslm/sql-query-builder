@@ -2,10 +2,10 @@
 
 namespace Didslm\QueryBuilder\Components;
 
-interface GroupCondition extends Condition
+interface GroupCondition
 {
-    public function getConditions(): array;
+    public function type(): string;
 
-    public function addCondition(Condition $condition): self;
+    public function toSql(): string;
 
 }

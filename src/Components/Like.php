@@ -2,9 +2,8 @@
 
 namespace Didslm\QueryBuilder\Components;
 
-use Didslm\QueryBuilder\Components\Condition;
 
-class Like implements Condition {
+class Like implements ConditionInterface {
     private const DEFAULT_OPERATOR = 'LIKE';
 
     private string $field;
@@ -18,7 +17,7 @@ class Like implements Condition {
         $this->operator = $operator;
     }
 
-    public static function create(string $field, string $value, string $operator = self::DEFAULT_OPERATOR): Condition
+    public static function create(string $field, string $value, string $operator = self::DEFAULT_OPERATOR): ConditionInterface
     {
         return new self($field, $value, $operator);
     }

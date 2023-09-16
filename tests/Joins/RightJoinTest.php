@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace Didslm\QueryBuilder\Tests\Joins;
+
 use Didslm\QueryBuilder\Components\Joins\RightJoin;
 use Didslm\QueryBuilder\Components\Table;
 use PHPUnit\Framework\TestCase;

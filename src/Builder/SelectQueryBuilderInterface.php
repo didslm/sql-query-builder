@@ -2,7 +2,7 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Components\ConditionInterface;
 
 interface SelectQueryBuilderInterface extends QueryBuilder
 {

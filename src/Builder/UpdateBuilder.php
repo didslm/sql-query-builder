@@ -4,8 +4,7 @@ namespace Didslm\QueryBuilder\Builder;
 
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
 use Didslm\QueryBuilder\Components\Table;
-use Didslm\QueryBuilder\Components\Where;
-use Didslm\QueryBuilder\Queries\QueryType;
+use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Queries\Update;
 
 class UpdateBuilder implements Builder
@@ -39,7 +38,7 @@ class UpdateBuilder implements Builder
 
     public function where(string $column, mixed $value, ?string $operator = null):self
     {
-        $this->wheres[] = new Where($column, $value, $operator);
+        $this->wheres[] = new Condition($column, $value, $operator);
         return $this;
     }
 

@@ -19,9 +19,10 @@ class FullJoin implements Join
         }
     }
 
-    public function setParentTable(Table $table): void
+    public function setParentTable(Table $table): self
     {
         $this->parentTable = $table;
+        return $this;
     }
 
     public function getColumn(): string

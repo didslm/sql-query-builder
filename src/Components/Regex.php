@@ -3,7 +3,7 @@
 namespace Didslm\QueryBuilder\Components;
 
 
-class Regex implements Condition
+class Regex implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'REGEXP';
     protected string $column;
@@ -16,7 +16,7 @@ class Regex implements Condition
         $this->pattern = $pattern;
     }
 
-    public static function create(string $column, string $pattern): Condition
+    public static function create(string $column, string $pattern): ConditionInterface
     {
         return new self($column, $pattern);
     }

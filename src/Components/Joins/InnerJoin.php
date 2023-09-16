@@ -31,9 +31,10 @@ class InnerJoin implements Join
 
 
 
-    public function setParentTable(Table $table): void
+    public function setParentTable(Table $table): self
     {
         $this->parentTable = $table;
+        return $this;
     }
 
     public function toSql(): string

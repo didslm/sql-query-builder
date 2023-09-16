@@ -2,7 +2,8 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-use Didslm\QueryBuilder\Components\GroupCondition;
+
+use Didslm\QueryBuilder\Components\AndGroup;
 use Didslm\QueryBuilder\Components\In;
 use Didslm\QueryBuilder\Components\Joins\FullJoin;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
@@ -11,18 +12,23 @@ use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\Joins\RightJoin;
 use Didslm\QueryBuilder\Components\Like;
 use Didslm\QueryBuilder\Components\OrderBy;
-use Didslm\QueryBuilder\Components\OrImlp;
+use Didslm\QueryBuilder\Components\OrGroup;
 use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Table;
-use Didslm\QueryBuilder\Components\Where;
+use Didslm\QueryBuilder\Components\Condition;
 use Didslm\QueryBuilder\Queries\QueryType;
 use Didslm\QueryBuilder\Queries\Select;
 
 class SelectBuilder implements Builder
 {
+    private const AND_OPERATOR = 'AND';
+    private const OR_OPERATOR = 'OR';
+    private const DEFAULT_GROUP_OPERATOR = self::AND_OPERATOR;
+
     protected array $columns = [];
     protected string $fromTable;
-    protected array $wheres = [];
+    private array $conditions = [];
+
     protected array $orders = [];
     protected array $joins = [];
     protected int $limitStart;
@@ -55,45 +61,52 @@ class SelectBuilder implements Builder
 
     public function where(string $column, mixed $value, ?string $operator = null): self
     {
-        $this->wheres[] = new Where($column, $value, $operator);
+        $this->conditions[] = AndGroup::create(new Condition($column, $value, $operator));
         return $this;
     }
 
     public function and(string $column, mixed $value, ?string $operator = null): self
     {
-        $lastWhere = array_pop($this->wheres);
-        if ($lastWhere instanceof GroupCondition) {
-            $lastWhere->addCondition(new Where($column, $value, $operator));
-            $this->wheres[] = $lastWhere;
-        } else {
-            $this->wheres[] = new Where($column, $value, $operator);
+        $lastGroup = array_pop($this->conditions);
+        if ($lastGroup === null) {
+            return $this->where($column, $value, $operator);
         }
 
+        $lastGroup->addGroupCondition(new Condition($column, $value, $operator));
+        $this->conditions[] = $lastGroup;
         return $this;
-
     }
 
     public function or(string $column, mixed $value, ?string $operator = null): self
     {
-        $this->wheres[] = new OrImlp($column, $value, $operator);
+        $this->conditions[] = OrGroup::create(new Condition($column, $value, $operator));
+
+        return $this;
+    }
+
+    public function orGroup(): self
+    {
+        $this->conditions = [OrGroup::create(
+            ...$this->conditions
+        )];
         return $this;
     }
 
     public function in(string $column, array $values): self
     {
-        $this->wheres[] = new In($column, $values);
+        $this->conditions[] = AndGroup::create(new In($column, $values));
         return $this;
     }
 
     public function like(string $column, string $value): self
     {
-        $this->wheres[] = new Like($column, $value);
+        $this->conditions[] = AndGroup::create(new Like($column, $value));
         return $this;
     }
 
     public function regex(string $column, string $value): self
     {
-        $this->wheres[] = new Regex($column, $value);
+        $this->conditions[] = AndGroup::create(new Regex($column, $value));
         return $this;
     }
 
@@ -105,28 +118,30 @@ class SelectBuilder implements Builder
 
     public function leftJoin(string $table, string $column, string $reference): self
     {
-        $this->joins[] = new LeftJoin($table, $column, $reference);
+        $this->joins[] = (new LeftJoin($table, $column, $reference))
+            ->setParentTable(new Table($this->fromTable));
 
         return $this;
     }
 
-        public function rightJoin(string $table, string $column, string $reference): self
+    public function rightJoin(string $table, string $column, string $reference): self
     {
-        $this->joins[] = new RightJoin($table, $column, $reference);
+        $this->joins[] = (new RightJoin($table, $column, $reference))
+            ->setParentTable(new Table($this->fromTable));
 
         return $this;
     }
 
     public function innerJoin(string $table, string $column, string $reference): self
     {
-        $this->joins[] = new InnerJoin($table, $column, $reference);
+        $this->joins[] = (new InnerJoin($table, $column, $reference))->setParentTable(new Table($this->fromTable));
 
         return $this;
     }
 
     public function fullJoin(string $table, string $column, string $reference): self
     {
-        $this->joins[] = new FullJoin($table, $column, $reference);
+        $this->joins[] = (new FullJoin($table, $column, $reference))->setParentTable(new Table($this->fromTable));
 
         return $this;
     }
@@ -146,9 +161,10 @@ class SelectBuilder implements Builder
             $select->addColumn($column);
         }
 
-        foreach ($this->wheres as $where) {
-            $select->addWhere($where);
+        foreach ($this->conditions as $condition) {
+            $select->addGroup($condition);
         }
+
 
         foreach ($this->joins as $join) {
             $select->addJoin($join);

@@ -2,36 +2,64 @@
 
 namespace Didslm\QueryBuilder\Components;
 
-interface Condition
+use Didslm\QueryBuilder\Utilities\Cleaner;
+
+class Condition implements ConditionInterface
 {
-    const ALL_OPERATORS = [
-        '=',
-        '>',
-        '<',
-        '!=',
-        '>=',
-        '<=',
-        '<>',
-        'LIKE',
-        'NOT LIKE',
-        'IN',
-        'NOT IN',
-        'BETWEEN',
-        'NOT BETWEEN',
-        'IS NULL',
-        'IS NOT NULL',
-    ];
+    private const DEFAULT_OPERATOR = '=';
+    private string $field;
+    private string|float|int|null $value;
+    private string $operator;
 
-    const DEFAULT_OPERATORS_FOR_NULL = [
-        '=' => 'IS NULL',
-        '<>' => 'IS NOT NULL',
-        '!=' => 'IS NOT NULL',
-        '<' => 'IS NOT NULL',
-    ];
+    public function __construct(string $field, string|float|int|null $value, ?string $operator = null)
+    {
+        $this->field = $field;
+        $this->value = $value;
+        $this->operator = $operator ?? self::DEFAULT_OPERATOR;
 
-    public function getColumn(): string;
-    public function getValue() : string;
-    public function getOperator(): string;
-    public function toSql(): string;
-    public function __toString(): string;
+        if (!in_array($this->operator, self::ALL_OPERATORS)) {
+            throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));
+        }
+    }
+
+    public function getColumn(): string
+    {
+        return $this->field;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
+    public function getOperator(): string
+    {
+        return $this->operator;
+    }
+
+    public function toSql(): string
+    {
+           return $this->buildCondition();
+    }
+
+    private function buildCondition(): string
+    {
+        if (is_null($this->value)) {
+            return sprintf('%s %s', $this->field, self::DEFAULT_OPERATORS_FOR_NULL[$this->operator] ?? $this->operator);
+        }
+
+        if (is_numeric($this->value)) {
+            return sprintf('%s %s %s', $this->field, $this->operator, $this->value);
+        }
+
+        if (str_contains($this->value, ':') && strlen($this->value) > 1) {
+            return sprintf('%s %s %s', $this->field, $this->operator, Cleaner::escapeString($this->value));
+        }
+        return sprintf("%s %s '%s'", $this->field, $this->operator, Cleaner::escapeString($this->value));
+    }
+
+    public function __toString(): string
+    {
+        return $this->toSql();
+    }
 }
