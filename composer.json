@@ -2,6 +2,11 @@
   "name": "didslm/sql-builder",
   "description": "A flexible PHP package to build SQL queries using the builder pattern.",
   "type": "library",
+  "keywords": [
+    "sql",
+    "query",
+    "builder"
+  ],
   "require": {
     "php": "^8.0"
   },
@@ -30,8 +35,12 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "Your Name",
-      "email": "your.email@example.com"
+      "name": "Diar",
+      "email": "diarselimi92@gmail.com"
+    },
+    {
+      "name": "Ibnul Mutaki",
+      "email": "ibnuul@gmail.com"
     }
   ],
   "support": {

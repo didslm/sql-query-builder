@@ -6,4 +6,5 @@ interface QueryType
 {
     public function __toString(): string;
     public function toSql(): string;
+    public function getWhere(): string;
 }

@@ -5,9 +5,14 @@ namespace Didslm\QueryBuilder\Components;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class In extends AbstractCondition implements ConditionInterface
+/**
+ * An implementation for BETWEEN operator.
+ *
+ * @author Ibnul Mutaki <ibnuu@gmail.com>
+ */
+class Between extends AbstractCondition implements ConditionInterface
 {
-    private const DEFAULT_OPERATOR = 'IN';
+    private const DEFAULT_OPERATOR = 'BETWEEN';
 
     public function __construct(string $field, array $values, string $operator = self::DEFAULT_OPERATOR)
     {
@@ -17,7 +22,14 @@ class In extends AbstractCondition implements ConditionInterface
 
         if (empty($values)) {
             throw new \InvalidArgumentException('Array cannot be empty');
+        }
 
+        if (count($values) !== 2) {
+            throw new \InvalidArgumentException('The array is limited to only 2 index for its values.');
+        }
+
+        if ($values[0] > $values[1]) {
+            throw new \InvalidArgumentException('The first array index value should be lower than the second array index value.');
         }
 
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
@@ -29,14 +41,15 @@ class In extends AbstractCondition implements ConditionInterface
     {
         return new self($field, $values, $operator);
     }
+
     public function toSql(): string
     {
-        return sprintf('%s %s (%s)', $this->field, $this->operator, $this->getValue());
+        return sprintf('%s %s %s', $this->field, $this->operator, $this->getValue());
     }
 
     public function getValue(): string
     {
-        $values = array_map(function($value) {
+        $values = array_map(function ($value) {
             if (is_numeric($value)) {
                 return $value;
             } else {
@@ -44,6 +57,6 @@ class In extends AbstractCondition implements ConditionInterface
             }
         }, $this->value);
 
-        return implode(', ', $values);
+        return implode(' AND ', $values);
     }
 }

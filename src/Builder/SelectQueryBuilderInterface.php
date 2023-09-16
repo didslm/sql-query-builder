@@ -2,8 +2,6 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-use Didslm\QueryBuilder\Components\Condition;
-
 interface SelectQueryBuilderInterface extends QueryBuilder
 {
     public function limit(int $start, int $offset): QueryBuilder;

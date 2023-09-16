@@ -1,22 +1,21 @@
 <?php declare(strict_types=1);
 
 namespace Didslm\QueryBuilder\Components;
-
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 
 /**
- * An implementation for LIKE operator.
+ * An implementation for NOT LIKE operator.
  *
  * @author Ibnul Mutaki <ibnuu@gmail.com>
  */
 
-class Like extends AbstractCondition implements ConditionInterface {
-    private const DEFAULT_OPERATOR = 'LIKE';
+class NotLike extends AbstractCondition implements ConditionInterface {
+    private const DEFAULT_OPERATOR = 'NOT LIKE';
 
-    public function __construct(string $field, string $value, string $operator = self::DEFAULT_OPERATOR)
+    public function __construct(string $field, string $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
-        $this->value = $value;
+        $this->value = $values;
         $this->operator = $operator;
     }
 

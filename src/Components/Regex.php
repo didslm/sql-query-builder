@@ -1,29 +1,29 @@
 <?php
 
 namespace Didslm\QueryBuilder\Components;
+use Didslm\QueryBuilder\Interface\ConditionInterface;
 
 
-class Regex implements Condition
+class Regex extends AbstractCondition implements ConditionInterface
 {
     private const DEFAULT_OPERATOR = 'REGEXP';
-    protected string $column;
-    protected string $pattern;
 
+    /**
+     * Create a new Regex Contition instance.
+     *
+     * @param string $column column to query
+     * @param string $pattern regex patern to apply                     $loaderName
+     */
 
     public function __construct(string $column, string $pattern)
     {
-        $this->column = $column;
-        $this->pattern = $pattern;
+        $this->field = $column;
+        $this->value = $pattern;
     }
 
-    public static function create(string $column, string $pattern): Condition
+    public static function create(string $column, string $pattern): ConditionInterface
     {
         return new self($column, $pattern);
-    }
-
-    public function getColumn(): string
-    {
-        return $this->column;
     }
 
     public function getOperator(): string
@@ -31,21 +31,11 @@ class Regex implements Condition
         return self::DEFAULT_OPERATOR;
     }
 
-    public function getValue(): string
-    {
-        return $this->pattern;
-    }
-
     public function toSql(): string
     {
-        $pattern = str_contains($this->pattern, ':') ? $this->pattern : sprintf("'%s'", $this->pattern);
+        $pattern = str_contains($this->value, ':') ? $this->value : sprintf("'%s'", $this->value);
         return sprintf(
             '%s %s %s',
-            $this->column, self::DEFAULT_OPERATOR, $pattern);
-    }
-
-    public function __toString(): string
-    {
-        return $this->toSql();
+            $this->field, self::DEFAULT_OPERATOR, $pattern);
     }
 }

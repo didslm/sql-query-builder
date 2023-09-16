@@ -5,10 +5,15 @@ namespace Didslm\QueryBuilder\Components;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class In extends AbstractCondition implements ConditionInterface
-{
-    private const DEFAULT_OPERATOR = 'IN';
+/**
+ * An implementation for NOT IN operator.
+ *
+ * @author Ibnul Mutaki <ibnuu@gmail.com>
+ */
 
+class NotIn extends AbstractCondition implements ConditionInterface
+{
+    private const DEFAULT_OPERATOR = 'NOT IN';
     public function __construct(string $field, array $values, string $operator = self::DEFAULT_OPERATOR)
     {
         $this->field = $field;
@@ -29,6 +34,7 @@ class In extends AbstractCondition implements ConditionInterface
     {
         return new self($field, $values, $operator);
     }
+
     public function toSql(): string
     {
         return sprintf('%s %s (%s)', $this->field, $this->operator, $this->getValue());

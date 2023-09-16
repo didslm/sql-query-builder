@@ -1,6 +1,7 @@
 <?php
 
 namespace Didslm\QueryBuilder\Builder;
+use Didslm\QueryBuilder\SqlQueryBuilderException;
 
 class InsertBuilder
 {
@@ -22,7 +23,7 @@ class InsertBuilder
     public function addValues(array $values): InsertBuilder
     {
         if (count($this->columns) !== count($values)) {
-            throw new \Exception('Number of columns and values do not match');
+            throw new SqlQueryBuilderException('Number of columns and values do not match');
         }
 
         $this->values = $values;

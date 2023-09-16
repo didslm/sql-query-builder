@@ -2,7 +2,10 @@
 
 namespace Didslm\QueryBuilder\Builder;
 
-use Didslm\QueryBuilder\Components\GroupCondition;
+use Closure;
+use Didslm\QueryBuilder\Components\OrImplRaw;
+use Didslm\QueryBuilder\Components\WhereRaw;
+use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Components\In;
 use Didslm\QueryBuilder\Components\Joins\FullJoin;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
@@ -11,7 +14,7 @@ use Didslm\QueryBuilder\Components\Joins\LeftJoin;
 use Didslm\QueryBuilder\Components\Joins\RightJoin;
 use Didslm\QueryBuilder\Components\Like;
 use Didslm\QueryBuilder\Components\OrderBy;
-use Didslm\QueryBuilder\Components\OrImlp;
+use Didslm\QueryBuilder\Components\OrImpl;
 use Didslm\QueryBuilder\Components\Regex;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Components\Where;
@@ -53,29 +56,81 @@ class SelectBuilder implements Builder
         return $this;
     }
 
-    public function where(string $column, mixed $value, ?string $operator = null): self
+    public function where(string|Closure $column, mixed $value = null, ?string $operator = null): self
     {
-        $this->wheres[] = new Where($column, $value, $operator);
-        return $this;
-    }
+        if($column instanceof Closure) {
 
-    public function and(string $column, mixed $value, ?string $operator = null): self
-    {
-        $lastWhere = array_pop($this->wheres);
-        if ($lastWhere instanceof GroupCondition) {
-            $lastWhere->addCondition(new Where($column, $value, $operator));
-            $this->wheres[] = $lastWhere;
+            $_raw = $this->whereRawCallback($column);
+
+
+            $this->wheres[] = new WhereRaw($_raw);
+
         } else {
+            if(empty($value)) {
+                throw new \InvalidArgumentException("When using `where`, value cannot be null");
+            }
+
             $this->wheres[] = new Where($column, $value, $operator);
         }
+        return $this;
+    }
 
+    public function and(string|Closure $column, mixed $value = null, ?string $operator = null): self
+    {
+        $lastWhere = array_pop($this->wheres);
+
+        if($column instanceof Closure) {
+
+            $_raw = $this->whereRawCallback($column);
+            $this->wheres[] = $lastWhere;
+            $this->wheres[] = new WhereRaw($_raw);
+
+        } else {
+
+            if($value === null) {
+                throw new \InvalidArgumentException("When using `or` where, value cannot be null");
+            }
+
+            if ($lastWhere instanceof GroupConditionInterface) {
+                $lastWhere->addCondition(new Where($column, $value, $operator));
+                $this->wheres[] = $lastWhere;
+            } else {
+                $this->wheres[] = new Where($column, $value, $operator);
+            }
+        }
         return $this;
 
     }
 
-    public function or(string $column, mixed $value, ?string $operator = null): self
+    private function whereRawCallback($callback) {
+        $_virtual = new SelectBuilder();
+        $_virtual->fromTable = "";
+
+        $callback($_virtual);
+
+        $_raw = $_virtual->getWhere();
+
+        return $_raw;
+
+    }
+
+    public function or(string|Closure $column, mixed $value = null, ?string $operator = null): self
     {
-        $this->wheres[] = new OrImlp($column, $value, $operator);
+
+        if($column instanceof Closure) {
+
+            $_raw = $this->whereRawCallback($column);
+
+            $this->wheres[] = new OrImplRaw($_raw);
+
+        } else {
+
+            if($value === null) {
+                throw new \InvalidArgumentException("When using `or` where, value cannot be null");
+            }
+
+            $this->wheres[] = new OrImpl($column, $value, $operator);
+        }
         return $this;
     }
 
@@ -110,7 +165,7 @@ class SelectBuilder implements Builder
         return $this;
     }
 
-        public function rightJoin(string $table, string $column, string $reference): self
+    public function rightJoin(string $table, string $column, string $reference): self
     {
         $this->joins[] = new RightJoin($table, $column, $reference);
 
@@ -136,6 +191,11 @@ class SelectBuilder implements Builder
         $this->limitStart = $start;
         $this->limitOffset = $offset;
         return $this;
+    }
+
+    public function getWhere()
+    {
+        return $this->build()->getWhere();
     }
 
     public function build(): QueryType

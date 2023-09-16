@@ -2,18 +2,18 @@
 
 namespace Didslm\QueryBuilder\Components;
 
+use Closure;
+use Didslm\QueryBuilder\Interface\ConditionInterface;
+use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class Where implements GroupCondition
+class Where extends AbstractCondition implements GroupConditionInterface
 {
     private const DEFAULT_OPERATOR = '=';
-    private string $field;
-    private string|float|int|null $value;
-    private string $operator;
 
     private array $conditions = [];
 
-    public function __construct(string $field, string|float|int|null $value, ?string $operator = null)
+    public function __construct(string|Closure $field, string|float|int|null $value = null, ?string $operator = null)
     {
 
         $this->field = $field;
@@ -23,21 +23,6 @@ class Where implements GroupCondition
         if (!in_array($this->operator, self::ALL_OPERATORS)) {
             throw new \InvalidArgumentException(sprintf('Invalid operator %s', $this->operator));
         }
-    }
-
-    public function getColumn(): string
-    {
-        return $this->field;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    public function getOperator(): string
-    {
-        return $this->operator;
     }
 
     public function toSql(): string
@@ -51,7 +36,11 @@ class Where implements GroupCondition
             $sql = sprintf('%s AND %s', $sql, $condition->toSql());
         }
 
-        return sprintf('(%s)', $sql);
+        if(count($this->conditions) > 0) {
+            return sprintf('(%s)', $sql);
+        } else {
+            return $sql;
+        }
     }
 
     private function buildCondition(): string
@@ -67,12 +56,8 @@ class Where implements GroupCondition
         if (str_contains($this->value, ':') && strlen($this->value) > 1) {
             return sprintf('%s %s %s', $this->field, $this->operator, Cleaner::escapeString($this->value));
         }
-        return sprintf("%s %s '%s'", $this->field, $this->operator, Cleaner::escapeString($this->value));
-    }
 
-    public function __toString(): string
-    {
-        return $this->toSql();
+        return sprintf("%s %s '%s'", $this->field, $this->operator, Cleaner::escapeString($this->value));
     }
 
     public function getConditions(): array
@@ -80,9 +65,15 @@ class Where implements GroupCondition
         return $this->conditions;
     }
 
-    public function addCondition(Condition $condition): self
+    public function addCondition(ConditionInterface $condition): self
     {
         $this->conditions[] = $condition;
         return $this;
+    }
+
+    public static function orInstance($obj)
+    {
+        $relevantClasses = [OrImpl::class, OrImplRaw::class];
+        return in_array(get_class($obj), $relevantClasses);
     }
 }

@@ -5,8 +5,8 @@ namespace Didslm\QueryBuilder\Builder;
 use Didslm\QueryBuilder\Components\Joins\InnerJoin;
 use Didslm\QueryBuilder\Components\Table;
 use Didslm\QueryBuilder\Components\Where;
-use Didslm\QueryBuilder\Queries\QueryType;
 use Didslm\QueryBuilder\Queries\Update;
+use Didslm\QueryBuilder\SqlQueryBuilderException;
 
 class UpdateBuilder implements Builder
 {
@@ -30,7 +30,7 @@ class UpdateBuilder implements Builder
     public function addValues(array $values):self
     {
         if (count($this->columns) !== count($values)) {
-            throw new \Exception('Number of columns and values do not match');
+            throw new SqlQueryBuilderException('Number of columns and values do not match');
         }
 
         $this->values = $values;

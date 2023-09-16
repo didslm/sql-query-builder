@@ -2,15 +2,17 @@
 
 namespace Didslm\QueryBuilder\Queries;
 
-use Didslm\QueryBuilder\Components\Condition;
+use Didslm\QueryBuilder\Components\Where;
+use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\OrderBy;
-use Didslm\QueryBuilder\Components\OrImlp;
 use Didslm\QueryBuilder\Components\Table;
+use Didslm\QueryBuilder\Trait\getWhereTrait;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 
 class Select implements QueryType
 {
+    use getWhereTrait;
     private array $conditions = [];
     private array $joins = [];
     private array $columns = [];
@@ -24,7 +26,7 @@ class Select implements QueryType
         return $this;
     }
 
-    public function addWhere(Condition $condition): Select
+    public function addWhere(ConditionInterface $condition): Select
     {
         $this->conditions[] = $condition;
         return $this;
@@ -62,7 +64,7 @@ class Select implements QueryType
             $sql .= ' WHERE ' . $first->toSql();
 
             foreach ($this->conditions as $condition) {
-                $andOr = $condition instanceof OrImlp ? ' OR ' : ' AND ';
+                $andOr = Where::orInstance($condition) ? ' OR ' : ' AND ';
                 $sql .= $andOr.$condition->toSql();
             }
         }
