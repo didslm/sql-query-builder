@@ -275,4 +275,15 @@ class SelectQueryBuilderTest extends TestCase
 
         $this->assertEquals("SELECT users.* FROM users WHERE (name = 'username' AND age = 18) AND (email = 'test@email.com' AND (class = '1A' AND banned = 0))", $sql->toSql());
     }
+
+    public function testSelectWithSubQuery()
+    {
+        $this->markTestSkipped('will be patch.');
+        $sql = SelectBuilder::from('users')
+            ->select("id", "(select option from setting where setting_user_id = id) as option_user")
+            ->where('status', 'active')
+            ->build();
+
+        $this->assertEquals("SELECT users.id, (select option from setting where setting_user_id = users.id) as option_user FROM users WHERE status = 'active'", $sql->toSql());
+    }
 }
