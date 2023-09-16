@@ -2,6 +2,7 @@
 
 namespace Didslm\QueryBuilder\Components;
 
+use Closure;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
@@ -12,7 +13,7 @@ class Where extends AbstractCondition implements GroupConditionInterface
 
     private array $conditions = [];
 
-    public function __construct(string $field, string|float|int|null $value, ?string $operator = null)
+    public function __construct(string|Closure $field, string|float|int|null $value = null, ?string $operator = null)
     {
 
         $this->field = $field;
@@ -35,7 +36,11 @@ class Where extends AbstractCondition implements GroupConditionInterface
             $sql = sprintf('%s AND %s', $sql, $condition->toSql());
         }
 
-        return sprintf('(%s)', $sql);
+        if(count($this->conditions) > 0) {
+            return sprintf('(%s)', $sql);
+        } else {
+            return $sql;
+        }
     }
 
     private function buildCondition(): string
@@ -51,6 +56,7 @@ class Where extends AbstractCondition implements GroupConditionInterface
         if (str_contains($this->value, ':') && strlen($this->value) > 1) {
             return sprintf('%s %s %s', $this->field, $this->operator, Cleaner::escapeString($this->value));
         }
+
         return sprintf("%s %s '%s'", $this->field, $this->operator, Cleaner::escapeString($this->value));
     }
 
@@ -63,5 +69,11 @@ class Where extends AbstractCondition implements GroupConditionInterface
     {
         $this->conditions[] = $condition;
         return $this;
+    }
+
+    public static function orInstance($obj)
+    {
+        $relevantClasses = [OrImpl::class, OrImplRaw::class];
+        return in_array(get_class($obj), $relevantClasses);
     }
 }

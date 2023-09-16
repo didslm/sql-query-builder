@@ -5,12 +5,14 @@ namespace Didslm\QueryBuilder\Queries;
 use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Components\Joins\Join;
 use Didslm\QueryBuilder\Components\Table;
+use Didslm\QueryBuilder\Trait\getWhereTrait;
 use Didslm\QueryBuilder\Utilities\AliasResolver;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 use Didslm\QueryBuilder\Utilities\ValueResolver;
 
 class Update implements QueryType
 {
+    use getWhereTrait;
     private array $conditions = [];
     private array $columns = [];
     private array $values = [];

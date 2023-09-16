@@ -6,7 +6,7 @@ use Didslm\QueryBuilder\Interface\ConditionInterface;
 use Didslm\QueryBuilder\Interface\GroupConditionInterface;
 use Didslm\QueryBuilder\Utilities\Cleaner;
 
-class OrImlp extends AbstractCondition implements GroupConditionInterface
+class OrImpl extends AbstractCondition implements GroupConditionInterface
 {
     private const DEFAULT_OPERATOR = '=';
     private array $conditions = [];
@@ -41,11 +41,15 @@ class OrImlp extends AbstractCondition implements GroupConditionInterface
         }
 
         foreach ($this->conditions as $condition) {
-            $andOr = $condition instanceof OrImlp ? 'OR' : 'AND';
+            $andOr = Where::orInstance($condition) ? 'OR' : 'AND';
             $sql = sprintf('%s %s %s', $sql, $andOr, $condition->toSql());
         }
 
-        return sprintf('(%s)', $sql);
+        if(count($this->conditions) > 0) {
+            return sprintf('(%s)', $sql);
+        } else {
+            return $sql;
+        }
     }
 
     private function buildCondition(): string
